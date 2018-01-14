@@ -22,7 +22,6 @@ var trainFrequency;
 
 // Function to clear form contents
 function clearForm(event) {
-    event.preventDefault();
     $("#trainName").val('');
     $("#trainDestination").val('');
     $("#trainTime").val('');
@@ -30,7 +29,7 @@ function clearForm(event) {
 }
 
 // click event when user add a new train
-$(".submitButton").on("click", function(event) {
+$(".submitButton").on("click", function (event) {
 
     event.preventDefault();
 
@@ -43,17 +42,24 @@ $(".submitButton").on("click", function(event) {
     trainFrequency = $("#trainFrequency").val().trim();
     console.log(trainFrequency);
 
-    var trainData = {
-        trainName: trainName,
-        trainDestination: trainDestination,
-        trainTime: trainTime,
-        trainFrequency: trainFrequency,
+    // Push data to database only if input fileds are not empty/blank
+    if (trainName != '' && trainDestination != '' && trainTime != '' && trainFrequency != '') {
+        // Call clearForm function clear input fields in the html form
+        clearForm();
+
+        var trainData = {
+            trainName: trainName,
+            trainDestination: trainDestination,
+            trainTime: trainTime,
+            trainFrequency: trainFrequency,
+        }
+
+        // Uploads data to firebase database
+        database.ref().push(trainData);
+
+    } else {
+        return;
     }
-
-    // Uploads data to firebase database
-    database.ref().push(trainData);
-
-    $(document).on("click", ".clearButton", clearForm);
 })
 
 // This event will be triggered once for each initial child at this location, and it will be triggered again every time a new child is added
@@ -98,7 +104,7 @@ database.ref().on("child_added", function (snapshot) {
     var nextTrain = moment().add(tMinutesTillTrain, "minutes").format("HH:mm");
     console.log("ARRIVAL TIME: " + moment(nextTrain).format("HH:mm"));
 
-    $(".table>tbody").append("<tr><td>" + trainName + "</td><td>" + trainDestination + "</td><td>" + trainFrequency + "</td><td>" + nextTrain + "</td><td>" + tMinutesTillTrain + "</td></tr>");
+    $(".table>tbody").append("<tr><td>" + trainName + "</td><td>" + trainDestination + "</td><td>" + trainFrequency + "</td><td>" + nextTrain + "</td><td>" + tMinutesTillTrain + "</td><td>" + "</td></tr>");
 
 
     // Handle the errors
@@ -106,6 +112,6 @@ database.ref().on("child_added", function (snapshot) {
     console.log("Errors handled: " + errorObject.code);
 });
 
-// To clear form contents if user wants to reenter train data
+// Calls clearForm function when user click on Clear button to remove/delete form input data in the html page
 $(document).on("click", ".clearButton", clearForm);
 
