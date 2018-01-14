@@ -43,10 +43,9 @@ $(".submitButton").on("click", function (event) {
 
     // Uploads data to firebase database
     database.ref().push(trainData);
-
 })
 
-
+// This event will be triggered once for each initial child at this location, and it will be triggered again every time a new child is added
 database.ref().on("child_added", function (snapshot) {
     // storing the snapshot.val() in a variable for convenience
     var trainDatabaseValue = snapshot.val();
@@ -56,6 +55,39 @@ database.ref().on("child_added", function (snapshot) {
     console.log(trainDatabaseValue.trainDestination);
     console.log(trainDatabaseValue.trainTime);
     console.log(trainDatabaseValue.trainFrequency);
+
+    var trainName = trainDatabaseValue.trainName;
+    var trainDestination = trainDatabaseValue.trainDestination;
+    var trainTime = trainDatabaseValue.trainTime;
+    var trainFrequency = trainDatabaseValue.trainFrequency;
+
+    console.log("train time is " + trainTime);
+
+    // First Time
+    var firstTimeConverted = moment(trainTime, "HH:mm");
+    console.log(firstTimeConverted);
+
+    // Current Time
+    var currentTime = moment();
+    console.log("CURRENT TIME: " + moment(currentTime).format("HH:mm"));
+
+    // Difference between the times
+    var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
+    console.log("DIFFERENCE IN TIME: " + diffTime);
+
+    // Time apart (remainder)
+    var tRemainder = diffTime % trainFrequency;
+    console.log(tRemainder);
+
+    // Minute Until Train
+    var tMinutesTillTrain = trainFrequency - tRemainder;
+    console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
+
+    // Next Train
+    var nextTrain = moment().add(tMinutesTillTrain, "minutes").format("HH:mm");
+    console.log("ARRIVAL TIME: " + moment(nextTrain).format("HH:mm"));
+
+    $(".table>tbody").append("<tr><td>" + trainName + "</td><td>" + trainDestination + "</td><td>" + trainFrequency + "</td><td>" + nextTrain + "</td><td>" + tMinutesTillTrain + "</td></tr>");
 
 
     // Handle the errors
