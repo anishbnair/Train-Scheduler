@@ -20,8 +20,17 @@ var trainDestination;
 var trainTime;
 var trainFrequency;
 
+// Function to clear form contents
+function clearForm(event) {
+    event.preventDefault();
+    $("#trainName").val('');
+    $("#trainDestination").val('');
+    $("#trainTime").val('');
+    $("#trainFrequency").val('');
+}
+
 // click event when user add a new train
-$(".submitButton").on("click", function (event) {
+$(".submitButton").on("click", function(event) {
 
     event.preventDefault();
 
@@ -43,6 +52,8 @@ $(".submitButton").on("click", function (event) {
 
     // Uploads data to firebase database
     database.ref().push(trainData);
+
+    $(document).on("click", ".clearButton", clearForm);
 })
 
 // This event will be triggered once for each initial child at this location, and it will be triggered again every time a new child is added
@@ -94,4 +105,7 @@ database.ref().on("child_added", function (snapshot) {
 }, function (errorObject) {
     console.log("Errors handled: " + errorObject.code);
 });
+
+// To clear form contents if user wants to reenter train data
+$(document).on("click", ".clearButton", clearForm);
 
