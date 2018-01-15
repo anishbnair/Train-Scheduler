@@ -22,7 +22,7 @@ var trainFrequency;
 
 // Function to clear form contents
 function clearForm(event) {
-    event.preventDefault();
+    // event.preventDefault();
     $("#trainName").val('');
     $("#trainDestination").val('');
     $("#trainTime").val('');
@@ -75,7 +75,7 @@ database.ref().on("child_added", function (snapshot) {
     var trainFrequency = trainDatabaseValue.trainFrequency;
 
     var trainKey = snapshot.key;
-    console.log("Train key is" +trainKey);
+    console.log("Train key is" + trainKey);
 
     console.log("train time is " + trainTime);
 
@@ -111,16 +111,25 @@ database.ref().on("child_added", function (snapshot) {
         <td>${trainFrequency}</td>
         <td>${nextTrain}</td>
         <td>${tMinutesTillTrain}</td>
-        <td>${"<button class='deleteTrain btn' data-train=" + trainKey + ">Delete</button>"}</td>
+        <td>${"<button class='deleteTrainBtn btn' data-train=" + trainKey + ">Delete</button>"}</td>
     </tr>
     `);
-
 
     // Handle the errors
 }, function (errorObject) {
     console.log("Errors handled: " + errorObject.code);
 });
 
+function deleteTrain() {
+    // Store data attribute (i.e. key) to a variable
+    var keyToDelete = $(this).attr("data-train");
+    console.log("ket to delete is" + keyToDelete);
+    database.ref(keyToDelete).remove();
+    $(this).closest('tr').remove();
+}
+
 // Calls clearForm function when user click on Clear button to remove/delete form input data in the html page
 $(document).on("click", ".clearButton", clearForm);
+// Calls deleteTrain function when user click on Delete button to delete train
+$(document).on("click", ".deleteTrainBtn", deleteTrain);
 
