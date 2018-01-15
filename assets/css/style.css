@@ -1,3 +1,17 @@
+html {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    position: relative;
+}
+
+body {
+     background-image: url('https://source.unsplash.com/dmH3NWhYTHQ');
+    /* /* -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover; */
+    background-size: cover; 
+}
+
 .jumbotron {
     color: white;
     background-color: #2F4F4F;
