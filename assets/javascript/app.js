@@ -22,7 +22,7 @@ var trainFrequency;
 
 // Function to clear form contents
 function clearForm(event) {
-    // event.preventDefault();
+    event.preventDefault();
     $("#trainName").val('');
     $("#trainDestination").val('');
     $("#trainTime").val('');
@@ -45,8 +45,6 @@ $(".submitButton").on("click", function (event) {
 
     // Push data to database only if input fileds are not empty/blank
     if (trainName != '' && trainDestination != '' && trainTime != '' && trainFrequency != '') {
-        // Call clearForm function clear input fields in the html form
-        clearForm();
 
         var trainData = {
             trainName: trainName,
@@ -61,6 +59,8 @@ $(".submitButton").on("click", function (event) {
     } else {
         return;
     }
+    // Call clearForm function clear input fields in the html form
+    clearForm();
 })
 
 // This event will be triggered once for each initial child at this location, and it will be triggered again every time a new child is added
