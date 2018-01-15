@@ -22,6 +22,7 @@ var trainFrequency;
 
 // Function to clear form contents
 function clearForm(event) {
+    event.preventDefault();
     $("#trainName").val('');
     $("#trainDestination").val('');
     $("#trainTime").val('');
