@@ -67,17 +67,15 @@ $(".submitButton").on("click", function (event) {
 database.ref().on("child_added", function (snapshot) {
     // storing the snapshot.val() in a variable for convenience
     var trainDatabaseValue = snapshot.val();
-
-    // Console.loging the last user's data
-    console.log(trainDatabaseValue.trainName);
-    console.log(trainDatabaseValue.trainDestination);
-    console.log(trainDatabaseValue.trainTime);
-    console.log(trainDatabaseValue.trainFrequency);
+    console.log("Train database value is " + trainDatabaseValue);
 
     var trainName = trainDatabaseValue.trainName;
     var trainDestination = trainDatabaseValue.trainDestination;
     var trainTime = trainDatabaseValue.trainTime;
     var trainFrequency = trainDatabaseValue.trainFrequency;
+
+    var trainKey = snapshot.key;
+    console.log("Train key is" +trainKey);
 
     console.log("train time is " + trainTime);
 
@@ -105,7 +103,17 @@ database.ref().on("child_added", function (snapshot) {
     var nextTrain = moment().add(tMinutesTillTrain, "minutes").format("HH:mm");
     console.log("ARRIVAL TIME: " + moment(nextTrain).format("HH:mm"));
 
-    $(".table>tbody").append("<tr><td>" + trainName + "</td><td>" + trainDestination + "</td><td>" + trainFrequency + "</td><td>" + nextTrain + "</td><td>" + tMinutesTillTrain + "</td><td>" + "</td></tr>");
+    // $(".table>tbody").append("<tr><td>" + trainName + "</td><td>" + trainDestination + "</td><td>" + trainFrequency + "</td><td>" + nextTrain + "</td><td>" + tMinutesTillTrain + "</td><td>" + "</td></tr>");
+    $(".table>tbody").append(`
+    <tr>
+        <td>${trainName}</td>
+        <td>${trainDestination}</td>
+        <td>${trainFrequency}</td>
+        <td>${nextTrain}</td>
+        <td>${tMinutesTillTrain}</td>
+        <td>${"<button class='deleteTrain btn' data-train=" + trainKey + ">Delete</button>"}</td>
+    </tr>
+    `);
 
 
     // Handle the errors
