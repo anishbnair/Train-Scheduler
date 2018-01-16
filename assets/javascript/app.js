@@ -19,10 +19,11 @@ var trainName;
 var trainDestination;
 var trainTime;
 var trainFrequency;
+var keyToUpdate = '';
 
 // Function to clear form contents
 function clearForm(event) {
-    event.preventDefault();
+    // event.preventDefault();
     $("#trainName").val('');
     $("#trainDestination").val('');
     $("#trainTime").val('');
@@ -54,7 +55,14 @@ $(".submitButton").on("click", function (event) {
         }
 
         // Uploads data to firebase database
-        database.ref().push(trainData);
+
+        if (keyToUpdate == '') {
+            database.ref().push(trainData);
+
+        } else {
+            database.ref(keyToUpdate).update(trainData);
+        }
+        keyToUpdate == '';
 
     } else {
         return;
@@ -75,33 +83,33 @@ database.ref().on("child_added", function (snapshot) {
     var trainFrequency = trainDatabaseValue.trainFrequency;
 
     var trainKey = snapshot.key;
-    console.log("Train key is" + trainKey);
+    // console.log("Train key is" + trainKey);
 
-    console.log("train time is " + trainTime);
+    // console.log("train time is " + trainTime);
 
     // First Time
     var firstTimeConverted = moment(trainTime, "HH:mm");
-    console.log(firstTimeConverted);
+    // console.log(firstTimeConverted);
 
     // Current Time
     var currentTime = moment();
-    console.log("CURRENT TIME: " + moment(currentTime).format("HH:mm"));
+    // console.log("CURRENT TIME: " + moment(currentTime).format("HH:mm"));
 
     // Difference between the times
     var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
-    console.log("DIFFERENCE IN TIME: " + diffTime);
+    // console.log("DIFFERENCE IN TIME: " + diffTime);
 
     // Time apart (remainder)
     var tRemainder = diffTime % trainFrequency;
-    console.log(tRemainder);
+    // console.log(tRemainder);
 
     // Minute Until Train
     var tMinutesTillTrain = trainFrequency - tRemainder;
-    console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
+    // console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
 
     // Next Train
     var nextTrain = moment().add(tMinutesTillTrain, "minutes").format("HH:mm");
-    console.log("ARRIVAL TIME: " + moment(nextTrain).format("HH:mm"));
+    // console.log("ARRIVAL TIME: " + moment(nextTrain).format("HH:mm"));
 
     // $(".table>tbody").append("<tr><td>" + trainName + "</td><td>" + trainDestination + "</td><td>" + trainFrequency + "</td><td>" + nextTrain + "</td><td>" + tMinutesTillTrain + "</td><td>" + "</td></tr>");
     $(".table>tbody").append(`
@@ -111,7 +119,8 @@ database.ref().on("child_added", function (snapshot) {
         <td>${trainFrequency}</td>
         <td>${nextTrain}</td>
         <td>${tMinutesTillTrain}</td>
-        <td>${"<button class='deleteTrainBtn btn' data-train=" + trainKey + ">Delete</button>"}</td>
+        <td>${"<button class='updateTrainBtn btn-primary' data-train=" + trainKey + ">Update</button>"}</td>
+        <td>${"<button class='deleteTrainBtn btn-danger' data-train=" + trainKey + ">Delete</button>"}</td>
     </tr>
     `);
 
@@ -123,13 +132,30 @@ database.ref().on("child_added", function (snapshot) {
 function deleteTrain() {
     // Store data attribute (i.e. key) to a variable
     var keyToDelete = $(this).attr("data-train");
-    console.log("ket to delete is" + keyToDelete);
+    // console.log("ket to delete is" + keyToDelete);
     database.ref(keyToDelete).remove();
     $(this).closest('tr').remove();
 }
+
+function updateTrain() {
+    // Store data attribute (i.e. key) to a variable
+    keyToUpdate = $(this).attr("data-train");
+    console.log("key to update is" + keyToUpdate);
+
+    database.ref(keyToUpdate).once('value').then(function (childSnapshot) {
+
+        $("#trainName").val(childSnapshot.val().trainName);
+        $("#trainDestination").val(childSnapshot.val().trainDestination);
+        $("#trainTime").val(childSnapshot.val().trainTime);
+        $("#trainFrequency").val(childSnapshot.val().trainFrequency);
+    })
+}
+
 
 // Calls clearForm function when user click on Clear button to remove/delete form input data in the html page
 $(document).on("click", ".clearButton", clearForm);
 // Calls deleteTrain function when user click on Delete button to delete train
 $(document).on("click", ".deleteTrainBtn", deleteTrain);
+// Calls updateTrain function when user click on Update button to update train info
+$(document).on("click", ".updateTrainBtn", updateTrain);
 
