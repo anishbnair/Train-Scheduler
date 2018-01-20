@@ -15,6 +15,12 @@
     <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase.js"></script>
     <!-- Moment.js Reference -->
     <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
+
+    <!-- You must include the Google Platform Library on your web pages that integrate Google Sign-In. -->
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <!-- Specify the client ID you created for your app in the Google Developers Console with the google-signin-client_id meta element. -->
+    <meta name="google-signin-client_id" content="1031333562864-1he1mdgt839u88qo6nq99vsbsbv2pdgf.apps.googleusercontent.com.apps.googleusercontent.com.apps.googleusercontent.com">
+
 </head>
 
 <body>
@@ -22,8 +28,10 @@
     <div class="container">
         <div class="jumbotron">
             <h1 class="display-4">Train Scheduler</h1>
+            <p>Sign in with google account to view Train Schedule</p>
+            <button class="text-center btn btn-sm signIn">Sign In with Google</button>
         </div>
-        <div class="row">
+        <div class="row trainSchedule">
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
@@ -39,8 +47,7 @@
                                     <th scope="col">Next Arrival</th>
                                     <th scope="col">Minutes Away</th>
                                     <th scope="col"></th>
-                                    <th scope="col"></th>
-                                    <!-- <th scope="col"><button class='edit btn' data-train=" + trainClass + "><i class='glyphicon glyphicon-pencil'></i></button></th> -->
+                                    <th scope="col"></th>                                    
                                 </tr>
                             </thead>
                             <tbody>
@@ -53,7 +60,7 @@
         </div>
         <br>
 
-        <div class="row">
+        <div class="row addTrain">
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
