@@ -1,17 +1,65 @@
 
 // Initialize Firebase
 var config = {
-    apiKey: "AIzaSyD-B837OrtBIX6Tvi6SRsq6AijWycqqkQY",
-    authDomain: "train-scheduler-faebe.firebaseapp.com",
-    databaseURL: "https://train-scheduler-faebe.firebaseio.com",
-    projectId: "train-scheduler-faebe",
-    storageBucket: "",
-    messagingSenderId: "620162093218"
+    apiKey: "AIzaSyCblT2nfpwzw2HumOPzdQOh3tLuOvozyiE",
+    authDomain: "bootcamp-learning.firebaseapp.com",
+    databaseURL: "https://bootcamp-learning.firebaseio.com",
+    projectId: "bootcamp-learning",
+    storageBucket: "bootcamp-learning.appspot.com",
+    messagingSenderId: "1031333562864"
 };
 
 firebase.initializeApp(config);
 
-// Create a variable to reference the database.
+$(".trainSchedule").hide();
+$(".addTrain").hide();
+
+// Google Authentication
+var provider = new firebase.auth.GoogleAuthProvider();
+
+$(document).on("click", ".signIn", function () {
+    console.log("Sign In button clicked");
+    firebase.auth().signInWithPopup(provider).then(function (result) {
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        var token = result.credential.accessToken;
+        console.log(token);
+        // The signed-in user info.
+        var user = result.user;
+        console.log(user);
+        $(".trainSchedule").show();
+        $(".addTrain").show();
+
+        // ...
+    }).catch(function (error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.log(errorMessage);
+        // The email of the user's account used.
+        var email = error.email;
+        // The firebase.auth.AuthCredential type that was used.
+        var credential = error.credential;
+        // ...
+    });
+    $(this).removeClass('signIn')
+        .addClass('signOut')
+        .html('Sign Out Of Google');
+});
+
+$(document).on('click', '.signOut', function () {
+    firebase.auth().signOut().then(function () {
+        // Sign-out successful.
+        $(".trainSchedule").hide();
+        $(".addTrain").hide();
+    }).catch(function (error) {
+        // An error happened.
+    });
+    $(this).removeClass('signOut')
+        .addClass('signIn')
+        .html('Sign In with Google');
+});
+
+// Create a variable to reference the database
 var database = firebase.database();
 
 // Initial variables
@@ -23,7 +71,7 @@ var keyToUpdate = '';
 
 // Function to clear form contents
 function clearForm(event) {
-    // event.preventDefault();
+    event.preventDefault();
     $("#trainName").val('');
     $("#trainDestination").val('');
     $("#trainTime").val('');
@@ -39,7 +87,7 @@ $(".submitButton").on("click", function (event) {
     console.log(trainName);
     trainDestination = $("#trainDestination").val().trim();
     console.log(trainDestination);
-    trainTime = $("#trainTime").val();
+    trainTime = $("#trainTime").val().trim();
     console.log(trainTime);
     trainFrequency = $("#trainFrequency").val().trim();
     console.log(trainFrequency);
@@ -67,8 +115,12 @@ $(".submitButton").on("click", function (event) {
     } else {
         return;
     }
-    // Call clearForm function clear input fields in the html form
-    clearForm();
+
+    // clearForm();
+    $("#trainName").val('');
+    $("#trainDestination").val('');
+    $("#trainTime").val('');
+    $("#trainFrequency").val('');
 })
 
 // This event will be triggered once for each initial child at this location, and it will be triggered again every time a new child is added
@@ -83,33 +135,24 @@ database.ref().on("child_added", function (snapshot) {
     var trainFrequency = trainDatabaseValue.trainFrequency;
 
     var trainKey = snapshot.key;
-    // console.log("Train key is" + trainKey);
-
-    // console.log("train time is " + trainTime);
 
     // First Time
     var firstTimeConverted = moment(trainTime, "HH:mm");
-    // console.log(firstTimeConverted);
 
     // Current Time
     var currentTime = moment();
-    // console.log("CURRENT TIME: " + moment(currentTime).format("HH:mm"));
 
     // Difference between the times
     var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
-    // console.log("DIFFERENCE IN TIME: " + diffTime);
 
     // Time apart (remainder)
     var tRemainder = diffTime % trainFrequency;
-    // console.log(tRemainder);
 
     // Minute Until Train
     var tMinutesTillTrain = trainFrequency - tRemainder;
-    // console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
 
     // Next Train
     var nextTrain = moment().add(tMinutesTillTrain, "minutes").format("HH:mm");
-    // console.log("ARRIVAL TIME: " + moment(nextTrain).format("HH:mm"));
 
     // $(".table>tbody").append("<tr><td>" + trainName + "</td><td>" + trainDestination + "</td><td>" + trainFrequency + "</td><td>" + nextTrain + "</td><td>" + tMinutesTillTrain + "</td><td>" + "</td></tr>");
     $(".table>tbody").append(`
@@ -143,14 +186,12 @@ function updateTrain() {
     console.log("key to update is" + keyToUpdate);
 
     database.ref(keyToUpdate).once('value').then(function (childSnapshot) {
-
         $("#trainName").val(childSnapshot.val().trainName);
         $("#trainDestination").val(childSnapshot.val().trainDestination);
         $("#trainTime").val(childSnapshot.val().trainTime);
         $("#trainFrequency").val(childSnapshot.val().trainFrequency);
     })
 }
-
 
 // Calls clearForm function when user click on Clear button to remove/delete form input data in the html page
 $(document).on("click", ".clearButton", clearForm);
